@@ -1,4 +1,7 @@
-import pygame
+import pygame, sys
+from button import Button
+from title_screen import title_screen as ts
+from pause_screen import pause_screen
 
 # Define colors
 BLACK = (0, 0, 0)
@@ -60,6 +63,9 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 # Set the title of the window
 pygame.display.set_caption('Pong')
 
+# Title screen before the game starts
+ts(screen)
+
 # Create the sprites
 player1_paddle = Paddle(WHITE, 10, 100, 20)
 player2_paddle = Paddle(WHITE, 10, 100, SCREEN_WIDTH - 30)
@@ -84,6 +90,9 @@ player2_score = 0
 # Set the font for the score
 font = pygame.font.Font(None, 50)
 
+# Create the pause button
+pause_button = Button("Pause", SCREEN_WIDTH - 100, 10, 80, 30, (0, 0, 0), (65, 65, 65))
+
 # Main game loop
 while game_on:
     for event in pygame.event.get():
@@ -92,6 +101,18 @@ while game_on:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_on = False
+            if event.key == pygame.K_p:
+                pause_screen(screen)
+
+        if event.type == pygame.MOUSEMOTION:
+            if pause_button.is_mouse_over(event.pos):
+                pause_button.current_color = pause_button.hover_color
+            else:
+                pause_button.current_color = pause_button.color
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if pause_button.is_mouse_over(event.pos):
+                pause_screen(screen)
 
     # Move the player 1 paddle
     keys = pygame.key.get_pressed()
@@ -131,6 +152,9 @@ while game_on:
     # Draw the sprites
     pygame.draw.line(screen, WHITE, [SCREEN_WIDTH // 2, 0], [SCREEN_WIDTH // 2, SCREEN_HEIGHT], 5)
     all_sprites_list.draw(screen)
+
+    # Draw the pause button
+    pause_button.draw(screen)
 
     # Draw the score
     player1_text = font.render(str(player1_score), True, WHITE)
